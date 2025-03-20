@@ -3,10 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
+	"mime"
 	"os"
 	"strconv"
-
-	"github.com/h2non/filetype"
+	"strings"
 )
 
 func main() {
@@ -19,14 +19,19 @@ func main() {
 			continue
 		}
 
-		buf, _ := os.ReadFile(v.Name())
-		kind, _ := filetype.Match(buf)
-		if kind.MIME.Type == "" {
+		dot_split := strings.LastIndex(v.Name(), ".")
+		extension := v.Name()[dot_split+1:]
+		mime := mime.TypeByExtension("." + extension)
+		if mime == "" {
 			fmt.Println("skipped unknown")
 			continue
 		}
-		new_dir := "./" + kind.MIME.Type
+		mime_split := strings.SplitAfterN(mime, "/", 3)
+		mime = mime_split[0]
+		// only split into first 1, we dont carer abt rest
+		fmt.Println(mime)
 
+		new_dir := "./" + mime
 		err := os.MkdirAll(new_dir, os.ModePerm)
 		if err != nil {
 			fmt.Println(err.Error())
