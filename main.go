@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/h2non/filetype"
 )
@@ -29,7 +31,23 @@ func main() {
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-		os.Rename("./"+v.Name(), new_dir+"/"+v.Name())
+		new_path := new_dir + "/" + v.Name()
+		if _, err := os.Stat(new_path); err == nil {
+			i := 0
+			// 100 is absurd but we ball
+			for i = 0; i < 100; i++ {
+
+				if _, err := os.Stat(new_path + strconv.Itoa(i)); errors.Is(err, os.ErrNotExist) {
+					break
+				}
+			}
+			if i > 100 {
+				continue // just skip the file to be sure
+			}
+			new_path = new_path + strconv.Itoa(i)
+		}
+
+		os.Rename("./"+v.Name(), new_path)
 
 	}
 
