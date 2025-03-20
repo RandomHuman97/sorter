@@ -13,7 +13,7 @@ func main() {
 		fmt.Println(err.Error())
 	}
 	for _, v := range entries {
-		if !v.Type().IsRegular() {
+		if !v.Type().IsRegular() || v.Name() == "sorter" {
 			continue
 		}
 
